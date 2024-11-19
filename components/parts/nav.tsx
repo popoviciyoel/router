@@ -15,6 +15,8 @@ const links = [
   { href: "/endpoints", text: "Endpoints", icon: Layers },
   { href: "/leads", text: "Leads", icon: Contact },
   { href: "/logs", text: "Logs", icon: Disc3 },
+  { href: "/generate", text: "Generate", icon: Contact },
+  { href: "/coupon", text: "Coupon", icon: Disc3 },
 ];
 
 const otherLinks = [

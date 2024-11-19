@@ -95,6 +95,11 @@ const navLinks = [
     description: "Monitor your API usage and errors",
     href: "/logs",
   },
+  {
+    name: "Generate",
+    description: "Generate a game with AI",
+    href: "/generate",
+  },
 ];
 
 const Links = () => {
