@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useDrag } from "react-dnd";
 import Image from "next/image";
 import { text } from "stream/consumers";
+import { PlateEditor } from "@/components/editor/plate-editor";
 
 const ItemType = {
   TEXT_ELEMENT: "text",
@@ -124,7 +125,7 @@ const Text = ({ item, onUpdate }: any) => {
         // minHeight: "50px",
       }}
     >
-      {isEditing ? (
+      {/* {isEditing ? (
         <textarea
           value={text}
           onChange={handleTextChange}
@@ -147,7 +148,8 @@ const Text = ({ item, onUpdate }: any) => {
         >
           {text}
         </div>
-      )}{" "}
+      )}{" "} */}
+      <PlateEditor  />
     </div>
   );
 };

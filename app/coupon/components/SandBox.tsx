@@ -1,6 +1,13 @@
+'use client';
+
+import React from 'react';
+
 import { useDrop } from "react-dnd/dist/hooks/useDrop/useDrop";
 import DroppedElement from "./DroppedElement";
-// import { AIToolbarButton } from '@/components/plate-ui/ai-toolbar-button'
+
+
+
+
 
 const ItemType = {
     TEXT_ELEMENT: "text",
@@ -16,7 +23,7 @@ const Sandbox = ({ elements, onDrop }: any) => {
     }));
     console.log('elements', elements)
 
-    
+
     
   
     return (
@@ -33,7 +40,7 @@ const Sandbox = ({ elements, onDrop }: any) => {
         {elements.map((element: any) => (
           <DroppedElement key={element.id} item={element} />
         ))}
-        {/* <AIToolbarButton/> */}
+
       </div>
     );
   };

@@ -5,6 +5,7 @@ import { PageWrapper } from "@/components/parts/page-wrapper";
 import { Input } from "@/components/ui/input";
 import React from "react";
 import Dragger from "./components/Dragger";
+import { PlateEditor } from "@/components/editor/plate-editor";
 
 const pageData = {
   name: "Coupon",
@@ -23,7 +24,11 @@ export default function Page() {
         <div className="max-w-2xl">
     <Dragger/>
         </div>
+      
+       
+
       </PageWrapper>
+    
     </>
   );
 }
