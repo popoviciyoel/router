@@ -1,0 +1,42 @@
+.resizable {
+    position: relative;
+    border: 1px solid #ccc;
+    background: #f9f9f9;
+    overflow: hidden;
+    padding: 10px;
+    box-sizing: border-box;
+  }
+  
+  .resize-handle {
+    width: 10px;
+    height: 10px;
+    position: absolute;
+    cursor: pointer;
+    opacity: 0; /* Invisible handles */
+    pointer-events: auto; /* Ensure interactivity */
+  }
+  
+  .resize-handle.top-left {
+    top: -5px;
+    left: -5px;
+    cursor: nwse-resize;
+  }
+  
+  .resize-handle.top-right {
+    top: -5px;
+    right: -5px;
+    cursor: nesw-resize;
+  }
+  
+  .resize-handle.bottom-left {
+    bottom: -5px;
+    left: -5px;
+    cursor: nesw-resize;
+  }
+  
+  .resize-handle.bottom-right {
+    bottom: -5px;
+    right: -5px;
+    cursor: nwse-resize;
+  }
+  

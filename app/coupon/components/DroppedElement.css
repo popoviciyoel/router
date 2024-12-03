@@ -1,0 +1,73 @@
+.focused-text {
+  min-height: 50px;
+  min-width: 150px;
+  border: 2px dotted black;
+  outline: none;
+  font-family: inherit;
+  font-size: inherit;
+  background-color: transparent;
+  /* display: flex; */
+  /* justify-content: center; */
+  /* text-align: center; */
+  /* align-items: center; */
+}
+
+.text {
+  
+  border: 2px dotted transparent;
+  outline: none !important;
+  font-family: inherit;
+  font-size: inherit;
+  background-color: transparent;
+  /* display: flex; */
+  cursor: grab;
+  justify-content: center;
+  /* text-align: center; */
+  align-items: center;
+  min-height: 50px;
+    min-width: 150px;
+  
+}
+
+.text:hover {
+    /* border-bottom: 1.5px solid rgb(6, 163, 241); */
+   
+}
+
+.text:active {
+    border-bottom: none
+    
+}
+
+.button-text {
+  border: 2px dotted transparent;
+  outline: none;
+  font-family: inherit;
+  font-size: inherit;
+  background-color: rgb(6, 163, 241);;
+  display: flex;
+  cursor: grab;
+  justify-content: center;
+  text-align: center;
+  align-items: center;
+  border-radius: 10px;
+  padding: 5px;
+}
+
+.button-text-focused {
+  border: 2px dotted black;
+  outline: none;
+  font-family: inherit;
+  font-size: inherit;
+  background-color: rgb(6, 163, 241);;
+  display: flex;
+  cursor: grab;
+  justify-content: center;
+  text-align: center;
+  align-items: center;
+  /* border-radius: 10px; */
+  padding: 5px;
+}
+
+
+

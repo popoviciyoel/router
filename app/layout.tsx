@@ -8,9 +8,9 @@ import { Toaster } from "@/components/ui/sonner";
 const space = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Router.so | The world's simplest lead router",
+  title: "BetterGames | The world's simplest gamified marketing tool",
   description:
-    "Router.so is the world's simplest lead router. Built for developers, by developers.",
+    "BetterGames is the world's simplest gamified marketing tool. Built for graphics designers and marketers looking for an edge",
 };
 
 export default function RootLayout({

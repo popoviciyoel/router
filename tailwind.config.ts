@@ -1,4 +1,6 @@
 import type { Config } from "tailwindcss";
+const { blackA, mauve, violet, tomatoe, red } = require("@radix-ui/colors");
+
 
 const config = {
   darkMode: ["class"],
@@ -52,6 +54,11 @@ const config = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        ...blackA,
+				...mauve,
+				...violet,
+        ...tomatoe,
+        ...red,
       },
       borderRadius: {
         lg: "var(--radius)",

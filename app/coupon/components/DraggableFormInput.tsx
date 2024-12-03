@@ -20,6 +20,8 @@ const DraggableFormInput = () => {
         border: "1px solid #ccc",
         borderRadius: "5px",
         cursor: "grab",
+              maxWidth: '5em',
+        minHeight: '5em'
       }}
     >
       Form Input

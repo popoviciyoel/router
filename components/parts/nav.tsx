@@ -8,15 +8,15 @@ import { ModeToggle } from "@/components/parts/mode-toggle";
 import Logo from "@/public/logo.svg";
 
 // Icon Imports
-import { BarChart, Contact, Layers, LifeBuoy, Disc3, Book } from "lucide-react";
+import { BarChart, Contact, Layers, LifeBuoy, Disc3, Book, TicketPercent, WandSparkles} from "lucide-react";
 
 const links = [
   { href: "/", text: "Dashboard", icon: BarChart },
-  { href: "/endpoints", text: "Endpoints", icon: Layers },
+  // { href: "/endpoints", text: "Endpoints", icon: Layers },
   { href: "/leads", text: "Leads", icon: Contact },
-  { href: "/logs", text: "Logs", icon: Disc3 },
-  { href: "/generate", text: "Generate", icon: Contact },
-  { href: "/coupon", text: "Coupon", icon: Disc3 },
+  // { href: "/logs", text: "Logs", icon: Disc3 },
+  { href: "/generate", text: "Generate", icon: WandSparkles },
+  { href: "/coupon", text: "Coupon", icon: TicketPercent },
 ];
 
 const otherLinks = [
@@ -60,7 +60,7 @@ export default function Nav() {
             <div className="flex justify-between items-center gap-2">
               <ModeToggle />
               <p className="text-xs text-muted-foreground opacity-50">
-                © router.so, 2024
+                © BetterGames, 2024
               </p>
             </div>
           </div>

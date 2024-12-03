@@ -1,8 +1,13 @@
-import React, { useState } from "react";
-import { useDrag } from "react-dnd";
+import React, { useEffect, useRef, useState } from "react";
+import { useDrag, useDragLayer } from "react-dnd";
 import Image from "next/image";
-import { text } from "stream/consumers";
+import ToolbarDemo from "@/components/parts/tool-bar";
+import OutsideClickHandler from "react-outside-click-handler";
+import CoordinatesBar from "@/components/parts/coordinates-bar";
+import RedirectLinkBar from "@/components/parts/redirect-link-bar";
+import { Textarea } from "@/components/ui/textarea";
 
+import "./DroppedElement.css";
 const ItemType = {
   TEXT_ELEMENT: "text",
   FORM_INPUT: "formInput",
@@ -12,23 +17,122 @@ const ItemType = {
 const DroppedElement = ({
   item,
   onUpdate,
+  offsetRef,
 }: {
   item: any;
   onUpdate: (updatedItem: any) => void;
+  offsetRef: any;
 }) => {
-  const [, drag] = useDrag(() => ({
+  const [isEditing, setIsEditing] = useState(false); // Track edit mode
+  const { isDragging, clientOffset, initalClientOffset } = useDragLayer(
+    (monitor) => ({
+      isDragging: monitor.isDragging(),
+      clientOffset: monitor.getClientOffset(),
+      initalClientOffset: monitor.getInitialClientOffset(),
+      
+
+      // canDrag: () => !isEditing, // Disable dragging when in edit mode
+    })
+  );
+  const ref = useRef();
+
+  const [collected, drag, previewRef] = useDrag(() => ({
     type: ItemType.TEXT_ELEMENT,
+    canDrag: () => !isEditing, // Disable dragging when in edit mode
+    collect: (monitor) => {
+      console.log("monitor", monitor);
+      const clientOffset = monitor.getInitialClientOffset();
+      const sourceOffset = monitor.getInitialSourceClientOffset();
+
+      // Calculate offset at drag start
+      if (clientOffset && sourceOffset) {
+        // Store the offset in the ref (does not trigger re-renders)
+        offsetRef.current = {
+          x: clientOffset.x - sourceOffset.x,
+          y: clientOffset.y - sourceOffset.y,
+        };
+      }
+
+      if (monitor.isDragging()) {
+        setIsEditing(false);
+        const offset = monitor.getClientOffset();
+        if (offset) {
+          console.log("{ x: offset.x, y: offset.y }", {
+            x: offset.x,
+            y: offset.y,
+          });
+
+          return {
+            isDragging: monitor.isDragging(),
+            coordinates: { x: offset.x, y: offset.y },
+            clientOffset: monitor.getClientOffset(), // Track mouse position
+          };
+        }
+      } // Track dragging state
+      return {
+        isDragging: monitor.isDragging(),
+        clientOffset: monitor.getClientOffset(), // Track mouse position
+        id: item.id,
+      };
+    },
+    previewOptions: {
+      captureDraggingState: false,
+    },
     item: item,
   }));
 
+  drag(ref);
+
+
+  const [text, setText] = useState(item.text); // Track text state
+  const refTool = useRef();
+
+
   return (
-    <div ref={drag} style={{ position: "absolute", left: item.x, top: item.y }}>
-      {item.type === "formInput" ? (
-        <FormInput item={item} />
-      ) : item.type === "button" ? (
-        <ButtonInput item={item} />
-      ) : item.type === "image" ? < ImageInput item={item}/> : (
-        <Text item={item} onUpdate={onUpdate} />
+    <div
+      ref={ref}
+      style={{
+        position: "absolute",
+        left: `${item.x}%`,
+        top: `${item.y}%`,
+        transform: "translate(0, 0)",
+        zIndex: 0
+      }}
+    >
+       {isEditing ? (  <ToolbarDemo
+            editorRef={refTool}
+            setText={setText}
+          />): null}
+      <div
+        style={{ opacity: isDragging && collected?.id !== item?.id ? 0 : 1 }}
+      >
+        {item.type === "formInput" ? (
+          <FormInput item={item} />
+        ) : item.type === "button" ? (
+          <ButtonInput
+            item={item}
+            isEditing={isEditing}
+            setIsEditing={setIsEditing}
+          />
+        ) : item.type === "image" ? (
+          <ImageInput item={item} />
+        ) : (
+          <>
+            <Text
+              item={item}
+              onUpdate={onUpdate}
+              isEditing={isEditing}
+              setIsEditing={setIsEditing}
+            />
+          </>
+        )}
+      </div>
+      {/* Display coordinates */}
+      {isDragging && collected?.id !== item?.id && (
+        <CoordinatesBar
+          x={clientOffset.x - item.containerLeft - offsetRef.current?.x}
+          y={clientOffset.y - item.containerTop - offsetRef.current?.y}
+        />
       )}
     </div>
   );
@@ -55,20 +159,39 @@ const FormInput = ({ item }: any) => {
   );
 };
 
-const ButtonInput = ({ item }: any) => {
-  return (
-    <button
-      style={{
-        padding: "8px 16px",
-        fontSize: "14px",
-        color: "#fff",
-        backgroundColor: "#007BFF",
-        border: "none",
-        borderRadius: "4px",
-        cursor: "pointer",
-        boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-        transition: "background-color 0.2s, box-shadow 0.2s",
+const ButtonInput = ({ isEditing, item, setIsEditing }: any) => {
+  const [text, setText] = useState(item.text); // Track text state
+  const ref = useRef();
+
+  return isEditing ? (
+    <OutsideClickHandler
+      onOutsideClick={() => {
+        setIsEditing(false);
+
+        if (ref.current) setText(ref.current.innerHTML);
       }}
+    >
+      <ToolbarDemo />
+      <div ref={ref} contentEditable autoFocus className="button-text-focused">
+        {text}
+      </div>
+      {item?.action && <RedirectLinkBar />}
+    </OutsideClickHandler>
+  ) : (
+    <div
+      onClick={() => setIsEditing(true)}
+      // style={{
+      //   padding: "8px 16px",
+      //   fontSize: "14px",
+      //   color: "#fff",
+      //   backgroundColor: "#007BFF",
+      //   border: "none",
+      //   borderRadius: "4px",
+      //   cursor: "pointer",
+      //   boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+      //   transition: "background-color 0.2s, box-shadow 0.2s",
+      // }}
+      className="button-text"
       onMouseEnter={(e) => {
         e.target.style.backgroundColor = "#0056b3";
         e.target.style.boxShadow = "0 4px 6px rgba(0,0,0,0.2)";
@@ -78,77 +201,90 @@ const ButtonInput = ({ item }: any) => {
         e.target.style.boxShadow = "0 2px 4px rgba(0,0,0,0.1)";
       }}
     >
-      {item.text}
-    </button>
+      {text}
+    </div>
   );
 };
 
-const ImageInput = ({item}: any) => {
-  return <Image src={item.text}  alt={item.text}/>
-}
+const ImageInput = ({ item }: any) => {
+  return <Image src={item.text} alt={item.text} />;
+};
 
-const Text = ({ item, onUpdate }: any) => {
+const Text = ({ item, onUpdate, isEditing, setIsEditing }: any) => {
   const [text, setText] = useState(item.text); // Track text state
-  const [isEditing, setIsEditing] = useState(false); // Track edit mode
+  const ref = useRef();
+  const [properties, setProperties] = useState({});
+  const [selectedText, setSelectedText] = useState();
+  console.log("selectedText", text);
+
+  // useEffect(() => {
+  //   if(isDragging) {
+  //     setIsEditing(false)
+  //   }
+  // }, [isDragging])
 
   // Handle text changes
   const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    console.log("e", e);
     setText(e.target.value);
+    const textArea = ref.current;
+    console.log("textArea", textArea);
+    if (textArea) {
+      const start = textArea.selectionStart;
+      const end = textArea.selectionEnd;
+      const selectedText = textArea.value.substring(start, end);
+      console.log("Selected text:", selectedText);
+      setSelectedText(selectedText);
+    }
   };
 
-  // Save changes when editing is done
-  const handleBlur = () => {
-    setIsEditing(false);
-    // onUpdate({ ...item, text }); // Update the parent state with new text
-  };
+  const editorRef = useRef(null); // Reference for the DOM element
 
   return (
+    <>
+    <div>
+            
+    </div>
     <div
       style={{
-        padding: "10px",
-
         cursor: isEditing ? "text" : "grab",
-        resize: "both", // Allow resizing
-
-        minHeight: "50px",
-
-        // padding: "10px",
-        background: "#ffffff",
-        border: "1px solid #ccc",
+        // userSelect: isEditing ? "text" : "none", // Prevent text selection when not editing
         borderRadius: "3px",
-        boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
-        // cursor: isEditing ? "text" : "grab",
-        // resize: "both", // Allow resizing
-        overflow: "auto", // Handle content overflow
-        minWidth: "100px", // Minimum size for expandability
-        // minHeight: "50px",
+        userSelect: "none", // Prevent text selection during drag
       }}
     >
       {isEditing ? (
-        <textarea
-          value={text}
-          onChange={handleTextChange}
-          onBlur={handleBlur}
-          autoFocus
-          style={{
-            width: "100%",
-            height: "100%",
-            border: "none",
-            outline: "none",
-            resize: "none",
-            fontFamily: "inherit",
-            fontSize: "inherit",
+        <OutsideClickHandler
+          onOutsideClick={() => {
+            setIsEditing(false);
+
+            if (ref.current) setText(ref.current.innerHTML);
           }}
-        />
+        >
+      
+          <div
+            ref={ref}
+            contentEditable
+            onChange={handleTextChange}
+            autoFocus
+            className="focused-text"
+            dangerouslySetInnerHTML={{
+              __html: text,
+            }}
+          ></div>
+        </OutsideClickHandler>
       ) : (
         <div
           onClick={() => setIsEditing(true)}
-          style={{ width: "100%", height: "100%" }}
-        >
-          {text}
-        </div>
-      )}{" "}
+          className="text"
+          onMouseDown={(e) => {}}
+          dangerouslySetInnerHTML={{
+            __html: text,
+          }}
+        ></div>
+      )}
     </div>
+    </>
   );
 };
 

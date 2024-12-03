@@ -120,3 +120,47 @@ type ServerActionFunction = (
 ) => Promise<{ error: string } | undefined>;
 
 type LogPostType = "http" | "form" | "webhook" | "email";
+
+enum Source {
+  WEB = "web", // just typing the domain in the web
+  SHARED = "shared", // friend invites friend through link, link has generated code from referrer
+  SOCIAL_MEDIA = "social_media", // comes from social media marketing campaigns
+  ONLINE_STORE = "online_store", // players who navigate to their online store
+}
+
+// Merchants can decide to give points or discount for their players
+type Player = {
+  lastPlayed: Date;
+  email: string;
+  firstName: string;
+  lastName: string;
+  points: number;
+  moneySpent: number;
+  pointsSpent: number;
+  couponsWon: number;
+  source: Source;
+  phone: string;
+  location: string;
+  invitesLimitedTo: number; // max number of invites per player
+  invited: string[]; // unique id
+  referredBy: string[]; // unique id
+  registeredInMarketingList: boolean
+};
+
+type TopSpenders = {
+  players: Player[];
+};
+
+type PlayerIsBuyer = boolean; 
+
+type Game = {
+  numLeads: number;
+  campaignEarnings: number;
+  views: number; // awareness
+  uniquePlayers: number; // awareness
+  averageDuration: number; // engagement
+  clicks: number; // engagement (any type of interaction with the game )
+  numShares: number; // engagement
+  players: Player[];
+  emailLeadsTo: string[]; // list of emails
+};

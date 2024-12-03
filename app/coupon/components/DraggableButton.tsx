@@ -1,16 +1,18 @@
 import { useDrag } from "react-dnd";
-
+import MenubarDemo from '@/components/parts/menu-bar'
 const ItemType = {
   BUTTON: "button",
 };
 
-const DraggableButton = () => {
+const DraggableButton = ({text, action, icon}) => {
   const [, drag] = useDrag(() => ({
     type: ItemType.BUTTON,
-    item: { type: "button", label: "Click Me" },
+    item: { type: "button", label: "Click Me", text, action },
   }));
 
   return (
+    <>
+    {/* <MenubarDemo/> */}
     <div
       ref={drag}
       style={{
@@ -20,10 +22,16 @@ const DraggableButton = () => {
         border: "1px solid #ccc",
         borderRadius: "5px",
         cursor: "grab",
+        display: 'flex',
+        alignItems: 'center',
+        maxWidth: '5em',
+        minHeight: '5em'
       }}
     >
-      Button
+      <span className=" mr-2">{text}</span>
+      {icon}
     </div>
+    </>
   );
 };
 
