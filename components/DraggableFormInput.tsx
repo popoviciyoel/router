@@ -16,11 +16,13 @@ const DraggableFormInput = () => {
       style={{
         padding: "10px",
         margin: "5px 0",
-        background: "#eef",
+        background: "#eee",
         border: "1px solid #ccc",
         borderRadius: "5px",
         cursor: "grab",
-              maxWidth: '5em',
+        display: 'flex',
+        alignItems: 'center',
+        maxWidth: '5em',
         minHeight: '5em'
       }}
     >

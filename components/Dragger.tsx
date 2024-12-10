@@ -5,6 +5,7 @@ import Sandbox from "./SandBox";
 import DraggableFormInput from "./DraggableFormInput";
 import DraggableButton from "./DraggableButton";
 import DraggableImageInput from "./DraggableImage";
+import { useCouponBuilder } from "@/app/coupon/CouponBuilderProvider";
 
 // const test = [
 //   {
@@ -51,47 +52,35 @@ import DraggableImageInput from "./DraggableImage";
 //   },
 // ];
 
-
-
 const Dragger = () => {
-  const [elements, setElements] = useState<any>();
+  const { state, dispatch } = useCouponBuilder();
+
+  const setElements = (element) => {
+    dispatch({ type: "ADD_ELEMENT", payload: element });
+  };
+
+  const updateElement = (element) => {
+    dispatch({ type: "UPDATE_ELEMENT", payload: element  });
+  };
 
   // Add a new element to the sandbox at the drop position
-  const handleDrop = (item: any, monitor: any) => {
-    // const offset = monitor.getSourceClientOffset();
-    // const offset2 = monitor.getClientOffset();
-    // const offset3 = monitor.getDifferenceFromInitialOffset()
-    // console.log('monitor', monitor)
-
-    // console.log("item", item);
-    // console.log('offset', offset)
-    // console.log('offset2', offset2)
-    // console.log('offset3', offset3)
-
+  const handleDrop = (item: any) => {
     //    Update position if the item already exists
     if (item.id) {
-      setElements((prev: any) =>
-        prev.map((existingItem: any) =>
-          existingItem.id === item.id
-            ? { ...existingItem, ...item }
-            : existingItem
-        )
-      );
+      console.log('item', item)
+      updateElement(item);
     } else {
       // Add a new item if it's a fresh drop
-      setElements((prev: any) => [
-        ...(prev || []),
-        {
-          id: Date.now(),
-          ...item,
-        },
-      ]);
+      setElements({
+        id: Date.now(),
+        ...item,
+      });
     }
   };
 
   return (
     <div style={{ padding: "20px", display: "flex", justifyContent: "center" }}>
-      <Sandbox elements={elements} onDrop={handleDrop} />
+      <Sandbox elements={state?.elements} onDrop={handleDrop} />
     </div>
   );
 };
