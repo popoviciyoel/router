@@ -7,69 +7,120 @@ import RadioGroupDemo from "./../radio-group";
 import { AccordionContent, AccordionTrigger } from "../accordian";
 import SliderDemo from "./../slider";
 import ImageUploader from "../image-uploader";
-
-
+import { useGameBuilder } from "@/app/build/GameBuilderProvider";
 
 const ClickTheTargetOptions = () => {
-    return <Accordion.Item className="AccordionItem" value="item-1">
-    <AccordionTrigger>Options</AccordionTrigger>
-    <AccordionContent>
-      <div style={{ display: "flex", alignItems: "center", margin: '1em 0em' }}>
-    
-        <ImageUploader direction="Upload Products"/>
-      </div>
-      <Separator />
- 
-      <div style={{ display: "flex", alignItems: "center", margin: '1em 0em'  }}>
-        <label
-          className="Label"
-          htmlFor="airplane-mode"
-          style={{ paddingRight: 15 }}
+  const { state, dispatch } = useGameBuilder();
+
+  const setShrinkMode = (value) => {
+    dispatch({
+      type: "ADD_GAME_OPTION",
+      payload: { type: "Target", options: { shrinkMode: value } },
+    });
+  };
+
+  const setMovementSpeed = (value) => {
+    dispatch({
+      type: "ADD_GAME_OPTION",
+      payload: { type: "Target", options: { speed: Number(value[0]) } },
+    });
+  };
+
+  const setGameType = (value) => {
+    dispatch({
+      type: "ADD_GAME_OPTION",
+      payload: { type: "Target", options: { type: value } },
+    });
+  };
+
+
+  const setGameTime = (e) => {
+    dispatch({
+      type: "ADD_GAME_OPTION",
+      payload: { type: "Target", options: { time: Number(e.target.value) } },
+    });
+  };
+
+
+  const setAsset = (imageURL) => {
+    dispatch({
+      type: "ADD_GAME_OPTION",
+      payload: { type: "Target", options: { target: imageURL } },
+    });
+  };
+  return (
+    <Accordion.Item className="AccordionItem" value="item-1">
+      <AccordionTrigger>Options</AccordionTrigger>
+      <AccordionContent>
+        <div
+          style={{ display: "flex", alignItems: "center", margin: "1em 0em" }}
         >
-         Adjust Game Time
-        </label>
-        <Input type="text" />
-      </div>
-      <Separator />
-      <div style={{ display: "flex", alignItems: "center" , margin: '1em 0em' }}>
-        <label
-          className="Label"
-          htmlFor="airplane-mode"
-          style={{ paddingRight: 15 }}
+          <ImageUploader direction="Upload Products" imageHandler={setAsset} />
+        </div>
+        <Separator />
+
+        <div
+          style={{ display: "flex", alignItems: "center", margin: "1em 0em" }}
         >
-         Game Type 
-        </label>        
-        <RadioGroupDemo labels={["Discrete", "Continuos"]}/>
-
-      </div>
-      <Separator />
-      <div style={{ display: "flex", alignItems: "center", margin: '1em 0em'  }}>
-        <label
-          className="Label"
-          htmlFor="airplane-mode"
-          style={{ paddingRight: 15 }}
+          <label
+            className="Label"
+            htmlFor="airplane-mode"
+            style={{ paddingRight: 15 }}
+          >
+            Adjust Game Time
+          </label>
+          <Input type="text" onChange={setGameTime}/>
+        </div>
+        <Separator />
+        <div
+          style={{ display: "flex", alignItems: "center", margin: "1em 0em" }}
         >
-         Target Movement Speed
-        </label>        
-        <SliderDemo/>
-
-      </div>
-      <Separator />
-      <div style={{ display: "flex", alignItems: "center", margin: '1em 0em'  }}>
-        <label
-          className="Label"
-          htmlFor="airplane-mode"
-          style={{ paddingRight: 15 }}
+          <label
+            className="Label"
+            htmlFor="airplane-mode"
+            style={{ paddingRight: 15 }}
+          >
+            Game Type
+          </label>
+          <RadioGroupDemo
+            defaultValue={"Discrete"}
+            labels={["Discrete", "Continuos"]}
+            onHandle={setGameType}
+          />
+        </div>
+        <Separator />
+        <div
+          style={{ display: "flex", alignItems: "center", margin: "1em 0em" }}
         >
-         Shrink Mode
-        </label>        
-        <RadioGroupDemo labels={["On", "Off"]}/>
+          <label
+            className="Label"
+            htmlFor="airplane-mode"
+            style={{ paddingRight: 15 }}
+          >
+            Target Movement Speed
+          </label>
+          <SliderDemo onHandle={setMovementSpeed} />
+        </div>
+        <Separator />
+        <div
+          style={{ display: "flex", alignItems: "center", margin: "1em 0em" }}
+        >
+          <label
+            className="Label"
+            htmlFor="airplane-mode"
+            style={{ paddingRight: 15 }}
+          >
+            Shrink Mode
+          </label>
+          <RadioGroupDemo
+            defaultValue={"Off"}
+            labels={["On", "Off"]}
+            onHandle={setShrinkMode}
+          />
+        </div>
+      </AccordionContent>
+    </Accordion.Item>
+  );
+};
 
-
-      </div>
-
-    </AccordionContent>
-  </Accordion.Item>
-}
-
-export default ClickTheTargetOptions
+export default ClickTheTargetOptions;

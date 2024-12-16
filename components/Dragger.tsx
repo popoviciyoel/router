@@ -1,10 +1,7 @@
 import React, { useState } from "react";
 
-import DraggableItem from "./DraggableText";
 import Sandbox from "./SandBox";
-import DraggableFormInput from "./DraggableFormInput";
-import DraggableButton from "./DraggableButton";
-import DraggableImageInput from "./DraggableImage";
+
 import { useCouponBuilder } from "@/app/coupon/CouponBuilderProvider";
 
 // const test = [
@@ -79,7 +76,7 @@ const Dragger = () => {
   };
 
   return (
-    <div style={{ padding: "20px", display: "flex", justifyContent: "center" }}>
+    <div style={{ paddingLeft: "20px",  paddingRight: "20px", display: "flex", justifyContent: "center" }}>
       <Sandbox elements={state?.elements} onDrop={handleDrop} />
     </div>
   );

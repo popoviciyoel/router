@@ -1,24 +1,32 @@
-import React, { useState } from 'react';
-import * as XLSX from 'xlsx';
+import React, { useState } from "react";
+import * as XLSX from "xlsx";
+import { Input } from "@/components/ui/input";
+import { CardContent, CardHeader, CardDescription} from "@/components/ui/card";
+import { useCouponBuilder } from "@/app/coupon/CouponBuilderProvider";
+import { Separator } from "@/components/ui/separator";
 
 const UploadParser = () => {
-  const [codes, setCodes] = useState([]);
-  const [fileName, setFileName] = useState('');
+  const [fileName, setFileName] = useState("");
+  const { dispatch } = useCouponBuilder();
+
+  const setUniqueCouponCodes = (payload) => {
+    dispatch({ type: "ADD_COUPON_UNIQUE", payload: payload });
+  };
 
   const handleFileUpload = (event) => {
     const file = event.target.files[0];
     if (file) {
-      const fileExtension = file.name.split('.').pop().toLowerCase();
+      const fileExtension = file.name.split(".").pop().toLowerCase();
       const reader = new FileReader();
 
       reader.onload = (e) => {
         const data = e.target.result;
         let workbook;
 
-        if (fileExtension === 'csv') {
-          workbook = XLSX.read(data, { type: 'string' });
+        if (fileExtension === "csv") {
+          workbook = XLSX.read(data, { type: "string" });
         } else {
-          workbook = XLSX.read(data, { type: 'binary' });
+          workbook = XLSX.read(data, { type: "binary" });
         }
 
         const sheetName = workbook.SheetNames[0]; // Assuming first sheet
@@ -26,11 +34,12 @@ const UploadParser = () => {
         const jsonData = XLSX.utils.sheet_to_json(sheet);
 
         // Extract 'codes' column and update state
-        const extractedCodes = jsonData
-          .map((row) => row.codes)
-          .filter(Boolean); // Remove any null or undefined values
+        const extractedCodes = jsonData.map((row) => row.Codes).filter(Boolean); // Remove any null or undefined values
 
-        setCodes(extractedCodes);
+        setUniqueCouponCodes({
+          coupons: extractedCodes,
+          couponQuantity: extractedCodes.length,
+        });
         setFileName(file.name);
       };
 
@@ -39,27 +48,22 @@ const UploadParser = () => {
   };
 
   return (
-    <div>
-      <h2>Upload and Parse CSV/Excel File</h2>
-      <input
-        type="file"
-        accept=".csv,.xlsx,.xls"
-        onChange={handleFileUpload}
-      />
-      {fileName && <p>Uploaded File: {fileName}</p>}
-
-      {codes.length > 0 && (
-        <div>
-          <h3>Codes Column Data:</h3>
-          <ul>
-            {codes.map((code, index) => (
-              <li key={index}>{code}</li>
-            ))}
-          </ul>
-        </div>
-      )}
-    </div>
+    <>
+      <CardHeader> Upload CSV/Excel File</CardHeader>
+      <Separator />
+      <CardDescription>
+        Your excel file must have the word "Codes" as a column
+      </CardDescription>
+      <CardContent>
+        <Input
+          type="file"
+          accept=".csv,.xlsx,.xls"
+          onChange={handleFileUpload}
+        />
+        {fileName && <p>Uploaded File: {fileName}</p>}
+      </CardContent>
+    </>
   );
 };
 
-export default UploadParser;
+export { UploadParser };

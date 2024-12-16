@@ -2,9 +2,9 @@ import React from "react";
 import * as Slider from "@radix-ui/react-slider";
 import "./styles.css";
 
-const SliderDemo = () => (
+const SliderDemo = ({onHandle}) => (
 	<form>
-		<Slider.Root className="SliderRoot" defaultValue={[3]} min={1} max={5} step={1}>
+		<Slider.Root className="SliderRoot" defaultValue={[3]} min={1} max={5} step={1} onValueChange={onHandle}>
 			<Slider.Track className="SliderTrack">
 				<Slider.Range className="SliderRange" />
 			</Slider.Track>

@@ -20,9 +20,11 @@ import "./styles.css";
 import ScrollAreaDemo from "./scroll-area";
 import * as Dialog from "@radix-ui/react-dialog";
 import { Button } from "../ui/button";
-import { HexColorPicker } from "react-colorful";
-import { PaintBucket, Maximize2 } from "lucide-react";
+import { RgbaColorPicker, RgbaColor } from "react-colorful";
+import Modal from "./modal";
+import { PaintBucket, Maximize2, Maximize } from "lucide-react";
 import { useCouponBuilder } from "@/app/coupon/CouponBuilderProvider";
+import { rgbaObjectToString, rgbaStringToObject } from "@/lib/utils/rgbaHelper";
 const Fonts = [
   "serif",
   "monospace",
@@ -65,17 +67,48 @@ const FontSizes = [
   "60px",
 ];
 
-export const ToolbarShape = ({
-  editorRef,
-  setWidth,
-  setHeight,
-  isModalOpen,
-  setIsModalOpen,
-}) => {
-  const handleSave = () => {
+export const ToolbarShape = ({ item, isModalOpen, setIsModalOpen }) => {
+  const [width, setWidth] = useState<string>(item?.width);
+  const [height, setHeight] = useState<string>(item?.height);
+  const [colorModal, setColorModal] = useState<boolean>(false);
+
+  const [color, setColor] = useState<RgbaColor>(item?.backgroundColor && rgbaStringToObject(item?.backgroundColor));
+
+  const { dispatch } = useCouponBuilder();
+
+  console.log("color", color);
+
+ 
+  const updateDimension = () => {
+    console.log({
+      type: "UPDATE_ELEMENT",
+      payload: { id: item?.id, width, height },
+    });
+    dispatch({
+      type: "UPDATE_ELEMENT",
+      payload: { id: item?.id, width, height },
+    });
+  };
+
+
+  const handleSaveDimension = () => {
     console.log("Width:", width);
     console.log("Height:", height);
+    updateDimension();
     setIsModalOpen(false);
+  };
+
+  const updateColor = () => {
+    dispatch({ type: "UPDATE_ELEMENT", payload: { id: item?.id, backgroundColor: rgbaObjectToString(color) } });
+  };
+  const handleSaveColor = () => {
+    console.log("color:", color);
+    updateColor();
+    setColorModal(false);
+  };
+
+  const removeElement = () => {
+    dispatch({ type: "REMOVE_ELEMENT", payload: { id: item?.id } });
   };
 
   return (
@@ -95,184 +128,151 @@ export const ToolbarShape = ({
             value="bold"
             aria-label="Bold"
           >
-            <Dialog.Root onOpenChange={() => setIsModalOpen(!isModalOpen)}>
-              <Dialog.Trigger asChild>
-                <Maximize2 />
+            <Dialog.Root>
+              <Dialog.Trigger onClick={() => setIsModalOpen(true)}>
+                <Maximize2  size={15}/>
               </Dialog.Trigger>
-              <Dialog.Portal>
-                <Dialog.Overlay
+            </Dialog.Root>
+            <Modal
+              title={"Set Dimensions"}
+              open={isModalOpen}
+              setOpen={setIsModalOpen}
+              handleSave={handleSaveDimension}
+              width={300}
+            >
+              <div style={{ marginBottom: "10px" }}>
+                <label
+                  htmlFor="width"
                   style={{
-                    position: "fixed",
-                    inset: 0,
-                    backgroundColor: "rgba(0, 0, 0, 0.6)",
-                  }}
-                />
-
-                <Dialog.Content
-                  style={{
-                    position: "fixed",
-                    top: "50%",
-                    left: "50%",
-                    transform: "translate(-50%, -50%)",
-                    backgroundColor: "white",
-                    borderRadius: "8px",
-                    padding: "20px",
-                    boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
-                    minWidth: "300px",
+                    display: "block",
+                    marginBottom: "5px",
+                    fontSize: "14px",
                   }}
                 >
-                  <Dialog.Title
-                    style={{
-                      marginBottom: "15px",
-                      fontSize: "18px",
-                      fontWeight: "bold",
-                    }}
-                  >
-                    Set Dimensions
-                  </Dialog.Title>
+                  Width
+                </label>
+                <input
+                  id="width"
+                  type="text"
+                  onChange={(e) => setWidth(e.target.value)}
+                  style={{
+                    width: "100%",
+                    padding: "8px",
+                    borderRadius: "4px",
+                    border: "1px solid #ccc",
+                  }}
+                />
+              </div>
 
-                  <div style={{ marginBottom: "10px" }}>
-                    <label
-                      htmlFor="width"
-                      style={{
-                        display: "block",
-                        marginBottom: "5px",
-                        fontSize: "14px",
-                      }}
-                    >
-                      Width
-                    </label>
-                    <input
-                      id="width"
-                      type="text"
-                      onChange={(e) => setWidth(e.target.value)}
-                      style={{
-                        width: "100%",
-                        padding: "8px",
-                        borderRadius: "4px",
-                        border: "1px solid #ccc",
-                      }}
-                    />
-                  </div>
-
-                  <div style={{ marginBottom: "15px" }}>
-                    <label
-                      htmlFor="height"
-                      style={{
-                        display: "block",
-                        marginBottom: "5px",
-                        fontSize: "14px",
-                      }}
-                    >
-                      Height
-                    </label>
-                    <input
-                      id="height"
-                      type="text"
-                      onChange={(e) => setHeight(e.target.value)}
-                      style={{
-                        width: "100%",
-                        padding: "8px",
-                        borderRadius: "4px",
-                        border: "1px solid #ccc",
-                      }}
-                    />
-                  </div>
-
-                  <div style={{ display: "flex", justifyContent: "flex-end" }}>
-                    <Dialog.Close asChild>
-                      <Button className="ml-0.5 inline-flex h-[25px] flex-shrink-0 flex-grow-0 basis-auto items-center justify-center rounded bg-white px-[5px] text-[13px] leading-none text-mauve11 outline-none first:ml-0 hover:bg-red3 hover:text-red11 focus:relative focus:shadow-[0_0_0_2px] focus:shadow-red7 data-[state=on]:bg-red5 data-[state=on]:text-red11">
-                        Cancel
-                      </Button>
-                    </Dialog.Close>
-
-                    <Button
-                      onClick={handleSave}
-                      className="ml-0.5 inline-flex h-[25px] flex-shrink-0 flex-grow-0 basis-auto items-center justify-center rounded bg-white px-[5px] text-[13px] leading-none text-mauve11 outline-none first:ml-0 hover:bg-violet3 hover:text-violet11 focus:relative focus:shadow-[0_0_0_2px] focus:shadow-violet7 data-[state=on]:bg-violet5 data-[state=on]:text-violet11"
-                    >
-                      Save
-                    </Button>
-                  </div>
-                </Dialog.Content>
-              </Dialog.Portal>
-            </Dialog.Root>
+              <div style={{ marginBottom: "15px" }}>
+                <label
+                  htmlFor="height"
+                  style={{
+                    display: "block",
+                    marginBottom: "5px",
+                    fontSize: "14px",
+                  }}
+                >
+                  Height
+                </label>
+                <input
+                  id="height"
+                  type="text"
+                  onChange={(e) => setHeight(e.target.value)}
+                  style={{
+                    width: "100%",
+                    padding: "8px",
+                    borderRadius: "4px",
+                    border: "1px solid #ccc",
+                  }}
+                />
+              </div>
+            </Modal>
           </Toolbar.ToggleItem>
           <Toolbar.ToggleItem
             className="ml-0.5 inline-flex h-[25px] flex-shrink-0 flex-grow-0 basis-auto items-center justify-center rounded bg-white px-[5px] text-[13px] leading-none text-mauve11 outline-none first:ml-0 hover:bg-violet3 hover:text-violet11 focus:relative focus:shadow-[0_0_0_2px] focus:shadow-violet7 data-[state=on]:bg-violet5 data-[state=on]:text-violet11"
             value="bold"
             aria-label="Bold"
           >
-            <Dialog.Root onOpenChange={() => setIsModalOpen(!isModalOpen)}>
-              <Dialog.Trigger asChild>
-                <PaintBucket />
+            <Dialog.Root>
+              <Dialog.Trigger onClick={() => setColorModal(true)}>
+                <PaintBucket size={15} />
               </Dialog.Trigger>
-              <Dialog.Portal>
-                <Dialog.Overlay
-                  style={{
-                    position: "fixed",
-                    inset: 0,
-                    backgroundColor: "rgba(0, 0, 0, 0.6)",
-                  }}
-                />
-
-                <Dialog.Content
-                  style={{
-                    position: "fixed",
-                    top: "50%",
-                    left: "50%",
-                    transform: "translate(-50%, -50%)",
-                    backgroundColor: "white",
-                    borderRadius: "8px",
-                    padding: "20px",
-                    boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
-                    minWidth: "300px",
-                  }}
-                >
-                  <Dialog.Title
-                    style={{
-                      marginBottom: "15px",
-                      fontSize: "18px",
-                      fontWeight: "bold",
-                    }}
-                  >
-                    Set Color
-                  </Dialog.Title>
-
-                  <div style={{ marginBottom: "10px" }}>
-                    <HexColorPicker />
-                  </div>
-
-                  <div style={{ display: "flex", justifyContent: "flex-end" }}>
-                    <Dialog.Close asChild>
-                      <Button className="ml-0.5 inline-flex h-[25px] flex-shrink-0 flex-grow-0 basis-auto items-center justify-center rounded bg-white px-[5px] text-[13px] leading-none text-mauve11 outline-none first:ml-0 hover:bg-red3 hover:text-red11 focus:relative focus:shadow-[0_0_0_2px] focus:shadow-red7 data-[state=on]:bg-red5 data-[state=on]:text-red11">
-                        Cancel
-                      </Button>
-                    </Dialog.Close>
-
-                    <Button
-                      onClick={handleSave}
-                      className="ml-0.5 inline-flex h-[25px] flex-shrink-0 flex-grow-0 basis-auto items-center justify-center rounded bg-white px-[5px] text-[13px] leading-none text-mauve11 outline-none first:ml-0 hover:bg-violet3 hover:text-violet11 focus:relative focus:shadow-[0_0_0_2px] focus:shadow-violet7 data-[state=on]:bg-violet5 data-[state=on]:text-violet11"
-                    >
-                      Save
-                    </Button>
-                  </div>
-                </Dialog.Content>
-              </Dialog.Portal>
             </Dialog.Root>
+            <Modal
+              title={"Set Color"}
+              handleSave={handleSaveColor}
+              open={colorModal}
+              setOpen={setColorModal}
+              width={300}
+            >
+              <div style={{ marginBottom: "10px" }}>
+                <RgbaColorPicker color={color} onChange={(v) => setColor(v)} />
+              </div>
+            </Modal>
           </Toolbar.ToggleItem>
         </Toolbar.ToggleGroup>
+        <Toolbar.Separator className="mx-2.5 w-px bg-mauve6" />
+      <Toolbar.ToggleGroup type="multiple" aria-label="Text formatting">
+        <Toolbar.ToggleItem
+          className="ml-0.5 inline-flex h-[25px] flex-shrink-0 flex-grow-0 basis-auto items-center justify-center rounded bg-white px-[5px] text-[13px] leading-none text-mauve11 outline-none first:ml-0 hover:bg-red3 hover:text-red11 focus:relative focus:shadow-[0_0_0_2px] focus:shadow-red7 data-[state=on]:bg-red5 data-[state=on]:text-red11"
+          value="right"
+          aria-label="Right aligned"
+          onClick={() => removeElement()}
+        >
+          <TrashIcon />
+        </Toolbar.ToggleItem>
+      </Toolbar.ToggleGroup>
       </Toolbar.Root>
     </>
   );
 };
 
-const ToolbarDemo = ({ editorRef, text, setText, isEditing, format, id }) => {
+const ToolbarDemo = ({ editorRef, item,  setText, isEditing, }) => {
   const [quill, setQuill] = useState(null);
   const [openDropDown, setOpenDropDown] = useState(false);
   const [value, setValue] = useState([]);
   const { state, dispatch } = useCouponBuilder();
+  const [color, setColor] = useState<RgbaColor>(item?.color && rgbaStringToObject(item?.color));
+
   const updateFormat = (format) => {
-    dispatch({ type: "UPDATE_ELEMENT", payload: { id, format } });
+    dispatch({ type: "UPDATE_ELEMENT", payload: { id: item?.id, format: item?.format } });
+  };
+  const [width, setWidth] = useState<string>(item?.width);
+  const [height, setHeight] = useState<string>(item?.height);
+  const [colorModal, setColorModal] = useState<boolean>(false);
+  const [isModalOpen, setIsModalOpen] = useState(false)
+
+  const removeElement = () => {
+    dispatch({ type: "REMOVE_ELEMENT", payload: { id: item?.id } });
+  };
+
+  const updateDimension = () => {
+    console.log({
+      type: "UPDATE_ELEMENT",
+      payload: { id: item?.id, width, height },
+    });
+    dispatch({
+      type: "UPDATE_ELEMENT",
+      payload: { id: item?.id, width, height },
+    });
+  };
+  const updateColor = () => {
+    dispatch({ type: "UPDATE_ELEMENT", payload: { id: item?.id, backgroundColor: rgbaObjectToString(color) } });
+  };
+  const handleSaveColor = () => {
+    console.log("color:", color);
+    updateColor();
+    setColorModal(false);
+  };
+
+
+
+  const handleSaveDimension = () => {
+    console.log("Width:", width);
+    console.log("Height:", height);
+    updateDimension();
+    setIsModalOpen(false);
   };
 
   useEffect(() => {
@@ -303,7 +303,7 @@ const ToolbarDemo = ({ editorRef, text, setText, isEditing, format, id }) => {
 
       setQuill(quillInstance);
       // Load initial content
-      quillInstance.root.innerHTML = text;
+      quillInstance.root.innerHTML = item?.text;
 
       // Listen for text changes
       quillInstance.on("text-change", () => {
@@ -334,7 +334,7 @@ const ToolbarDemo = ({ editorRef, text, setText, isEditing, format, id }) => {
         // updateFormat(appliedFormats);
       };
     }
-  }, [text]);
+  }, []);
 
   const applyFormat = (format, value) => {
     console.log("apply format", quill);
@@ -380,7 +380,6 @@ const ToolbarDemo = ({ editorRef, text, setText, isEditing, format, id }) => {
 
   console.log("quill", quill);
   // console.log(format?.has("bold"));
-  console.log("format", format);
 
   return (
     <Toolbar.Root
@@ -513,6 +512,94 @@ const ToolbarDemo = ({ editorRef, text, setText, isEditing, format, id }) => {
             )}
           </DropdownMenu.Root>
         </Toolbar.ToggleItem>
+        <Toolbar.ToggleItem
+            className="ml-0.5 inline-flex h-[25px] flex-shrink-0 flex-grow-0 basis-auto items-center justify-center rounded bg-white px-[5px] text-[13px] leading-none text-mauve11 outline-none first:ml-0 hover:bg-violet3 hover:text-violet11 focus:relative focus:shadow-[0_0_0_2px] focus:shadow-violet7 data-[state=on]:bg-violet5 data-[state=on]:text-violet11"
+            value="bold"
+            aria-label="Bold"
+          >
+            <Dialog.Root>
+              <Dialog.Trigger onClick={() => setIsModalOpen(true)}>
+                <Maximize2  size={15}/>
+              </Dialog.Trigger>
+            </Dialog.Root>
+            <Modal
+              title={"Set Dimensions"}
+              open={isModalOpen}
+              setOpen={setIsModalOpen}
+              handleSave={handleSaveDimension}
+              width={300}
+            >
+              <div style={{ marginBottom: "10px" }}>
+                <label
+                  htmlFor="width"
+                  style={{
+                    display: "block",
+                    marginBottom: "5px",
+                    fontSize: "14px",
+                  }}
+                >
+                  Width
+                </label>
+                <input
+                  id="width"
+                  type="text"
+                  onChange={(e) => setWidth(e.target.value)}
+                  style={{
+                    width: "100%",
+                    padding: "8px",
+                    borderRadius: "4px",
+                    border: "1px solid #ccc",
+                  }}
+                />
+              </div>
+
+              <div style={{ marginBottom: "15px" }}>
+                <label
+                  htmlFor="height"
+                  style={{
+                    display: "block",
+                    marginBottom: "5px",
+                    fontSize: "14px",
+                  }}
+                >
+                  Height
+                </label>
+                <input
+                  id="height"
+                  type="text"
+                  onChange={(e) => setHeight(e.target.value)}
+                  style={{
+                    width: "100%",
+                    padding: "8px",
+                    borderRadius: "4px",
+                    border: "1px solid #ccc",
+                  }}
+                />
+              </div>
+            </Modal>
+          </Toolbar.ToggleItem>
+          <Toolbar.ToggleItem
+            className="ml-0.5 inline-flex h-[25px] flex-shrink-0 flex-grow-0 basis-auto items-center justify-center rounded bg-white px-[5px] text-[13px] leading-none text-mauve11 outline-none first:ml-0 hover:bg-violet3 hover:text-violet11 focus:relative focus:shadow-[0_0_0_2px] focus:shadow-violet7 data-[state=on]:bg-violet5 data-[state=on]:text-violet11"
+            value="bold"
+            aria-label="Bold"
+          >
+            <Dialog.Root>
+              <Dialog.Trigger onClick={() => setColorModal(true)}>
+                <PaintBucket size={15} />
+              </Dialog.Trigger>
+            </Dialog.Root>
+            <Modal
+              title={"Set Color"}
+              handleSave={handleSaveColor}
+              open={colorModal}
+              setOpen={setColorModal}
+              width={300}
+            >
+              <div style={{ marginBottom: "10px" }}>
+                <RgbaColorPicker color={color} onChange={(v) => setColor(v)} />
+              </div>
+            </Modal>
+          </Toolbar.ToggleItem>
       </Toolbar.ToggleGroup>
       <Toolbar.Separator className="mx-2.5 w-px bg-mauve6" />
       <Toolbar.ToggleGroup
@@ -549,6 +636,7 @@ const ToolbarDemo = ({ editorRef, text, setText, isEditing, format, id }) => {
           className="ml-0.5 inline-flex h-[25px] flex-shrink-0 flex-grow-0 basis-auto items-center justify-center rounded bg-white px-[5px] text-[13px] leading-none text-mauve11 outline-none first:ml-0 hover:bg-red3 hover:text-red11 focus:relative focus:shadow-[0_0_0_2px] focus:shadow-red7 data-[state=on]:bg-red5 data-[state=on]:text-red11"
           value="right"
           aria-label="Right aligned"
+          onClick={() => removeElement()}
         >
           <TrashIcon />
         </Toolbar.ToggleItem>

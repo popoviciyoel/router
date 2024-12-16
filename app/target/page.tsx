@@ -12,7 +12,7 @@ import ClickTheTarget from "../games/ClickTheTarget";
 import {
   GameBuilderProvider,
   useGameBuilder,
-} from "./GameBuilderProvider";
+} from "../build/GameBuilderProvider";
 
 const pageData = {
   name: "Logs",

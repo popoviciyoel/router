@@ -3,34 +3,33 @@ import React, { useRef, useState } from "react";
 import { ToolbarShape } from "@/components/parts/tool-bar";
 import OutsideClickHandler from "react-outside-click-handler";
 
-const ShapeElement = ({ shape, isEditing, setIsEditing }) => {
+const ShapeElement = ({ item, isEditing, setIsEditing }) => {
   const ref = useRef();
-  const [width, setWidth] = useState("");
-  const [height, setHeight] = useState("");
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   // Define shape styles
   const getShapeStyle = () => {
-    switch (shape) {
+    switch (item?.shape) {
       case "circle":
         return {
-          width: width || "50px",
-          height: height || "50px",
+          width: item?.width || "50px",
+          height: item?.height  || "50px",
           borderRadius: "50%",
-          backgroundColor: "blue",
+          backgroundColor: item?.backgroundColor ||  "blue",
         };
       case "square":
         return {
-          width: width || "50px",
-          height: height || "50px",
-          backgroundColor: "green",
+          width: item?.width  || "50px",
+          height: item?.height || "50px",
+          backgroundColor: item?.backgroundColor || "green",
         };
       case "triangle":
         return {
-          width: width || "0",
-          height: height || "0",
+          width: item?.width  || "0",
+          height: item?.height || "0",
           borderLeft: "25px solid transparent",
           borderRight: "25px solid transparent",
-          borderBottom: "50px solid red",
+          borderBottom: `50px solid ${item?.backgroundColor || "red"}`,
         };
       default:
         return {};
@@ -43,15 +42,14 @@ const ShapeElement = ({ shape, isEditing, setIsEditing }) => {
         <OutsideClickHandler
           onOutsideClick={() => {
             console.log("isModalOpen", isModalOpen);
-            if (!isModalOpen) {
-              setIsEditing(false);
-            }
+            // if (!isModalOpen) {
+            //   setIsEditing(false);
+            // }
           }}
         >
           <ToolbarShape
-            editorRef={ref}
-            setWidth={setWidth}
-            setHeight={setHeight}
+            item={item}
+   
             isModalOpen={isModalOpen}
             setIsModalOpen={setIsModalOpen}
           />

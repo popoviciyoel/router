@@ -24,7 +24,7 @@ const DroppedElement = ({
   offsetRef: any;
 }) => {
   const [isEditing, setIsEditing] = useState(false); // Track edit mode
-  const { isDragging, clientOffset, initalClientOffset } = useDragLayer(
+  const { isDragging, clientOffset } = useDragLayer(
     (monitor) => ({
       isDragging: monitor.isDragging(),
       clientOffset: monitor.getClientOffset(),
@@ -109,6 +109,8 @@ const DroppedElement = ({
             item={item}
             isEditing={isEditing}
             setIsEditing={setIsEditing}
+            setText={updateText}
+
           />
         ) : item.type === "image" ? (
           <ImageElement item={item} />
@@ -125,7 +127,7 @@ const DroppedElement = ({
         )}
         {item.type === "shape" ? (
           <ShapeElement
-            shape={item.shape}
+            item={item}
             isEditing={isEditing}
             setIsEditing={setIsEditing}
           />

@@ -98,6 +98,7 @@
     "@udecode/plate-ui": "^35.0.0",
     "@vercel/postgres": "^0.9.0",
     "ai": "^3.4.33",
+    "axios": "^1.7.9",
     "class-variance-authority": "^0.7.0",
     "classnames": "^2.5.1",
     "clsx": "^2.1.0",

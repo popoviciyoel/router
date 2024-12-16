@@ -41,10 +41,8 @@ const TextElement = ({ item, isEditing, setIsEditing, setText }: any) => {
             <ToolbarDemo
               editorRef={ref}
               setText={setText}
-              text={item.text}
+              item={item}
               isEditing={isEditing}
-              format={item.format}
-              id={item.id}
             />
             <Editor editorRef={ref}/>
      

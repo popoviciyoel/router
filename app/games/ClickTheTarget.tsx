@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from "react";
-
+import { useGameBuilder } from "../build/GameBuilderProvider";
+import Image from "next/image";
 const ClickTheTarget = () => {
+  const { state } = useGameBuilder();
+
   const [gameMode, setGameMode] = useState(2); // Default mode
 
   const [targetPosition, setTargetPosition] = useState({
@@ -11,10 +14,23 @@ const ClickTheTarget = () => {
   const [score, setScore] = useState(0);
   const [timer, setTimer] = useState(30); // 30 seconds game duration
   const [targetSize, setTargetSize] = useState(Math.max(50 - score * 2, 20)); // Minimum size: 20px
+  const [shrinkTargetOn, setShrinkTargetOn] = useState(false);
   const [velocity, setVelocity] = useState({
     x: 10 + (Math.random() - 0.5) * 10,
     y: 10 + (Math.random() - 0.5) * 10,
   });
+
+  useEffect(() => {
+    const targetOptions = state?.options;
+    console.log('targetOptions', targetOptions)
+    setShrinkTargetOn(targetOptions?.shrinkMode === "On");
+    setTimer(targetOptions?.time)
+    setGameMode(targetOptions?.type === "Discrete" ? 1 : 2)
+    setVelocity({
+      x: 10 + (Math.random() - 0.5) * targetOptions?.speed * 40,
+      y: 10 + (Math.random() - 0.5) * targetOptions?.speed * 40,
+    })
+  }, [state?.options]);
 
   useEffect(() => {
     // Timer countdown
@@ -82,7 +98,7 @@ const ClickTheTarget = () => {
       moveTargetMode2();
     }
 
-    setTargetSize(Math.max(50 - score * 2, 20)); // Minimum size: 20px
+    if (shrinkTargetOn) setTargetSize(Math.max(50 - score * 2, 20)); // Minimum size: 20px
   };
 
   return (
@@ -101,8 +117,12 @@ const ClickTheTarget = () => {
     >
       {timer > 0 ? (
         <>
-          <div
+          <Image
+            src={state?.options?.target}
+            alt="Target"
             onClick={handleTargetClick}
+            width={200}
+            height={150}
             style={{
               position: "absolute",
               top: `${targetPosition.y}px`,

@@ -19,6 +19,7 @@ const initialState = {
   music: null, // Background music file
   soundEffects: {}, // Map of sound effects by action
   coupons: [], // List of available coupons
+  options: {},
 };
 
 // Action types
@@ -29,6 +30,7 @@ type BuilderAction =
   | { type: "SET_MUSIC"; payload: string | null }
   | { type: "ADD_SOUND_EFFECT"; payload: { action: string; sound: string } }
   | { type: "ADD_COUPON"; payload: string }
+  | { type: "ADD_GAME_OPTION"; payload: { type: string; options: any } }
   | { type: "REMOVE_COUPON"; payload: string }
   | { type: "CHANGE_STATE"; payload: BuilderState };
 
@@ -56,6 +58,12 @@ function builderReducer(state: typeof initialState, action: BuilderAction) {
       };
     case "ADD_COUPON":
       return { ...state, coupons: [...state.coupons, action.payload] };
+    case "ADD_GAME_OPTION":
+      switch (action.payload?.type) {
+        case "Target":
+          console.log('in target')
+          return { ...state, options: { ...state?.options, ...action.payload?.options } };
+      }
     case "REMOVE_COUPON":
       return {
         ...state,
@@ -95,6 +103,8 @@ export const GameBuilderProvider: React.FC<{ children: React.ReactNode }> = ({
 
     fetchCoupons();
   }, []);
+
+  console.log('Game Builder State', state)
 
   return (
     <BuilderContext.Provider value={{ state, dispatch }}>

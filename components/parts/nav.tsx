@@ -8,13 +8,14 @@ import { ModeToggle } from "@/components/parts/mode-toggle";
 import Logo from "@/public/logo.svg";
 
 // Icon Imports
-import { BarChart, Contact, Layers, LifeBuoy, Disc3, Book, TicketPercent, WandSparkles} from "lucide-react";
+import { BarChart, Contact, Layers, LifeBuoy, Disc3, Book, TicketPercent, WandSparkles, Joystick} from "lucide-react";
 
 const links = [
   { href: "/", text: "Dashboard", icon: BarChart },
   // { href: "/endpoints", text: "Endpoints", icon: Layers },
   { href: "/leads", text: "Leads", icon: Contact },
   // { href: "/logs", text: "Logs", icon: Disc3 },
+  { href: "/build", text: "New from Blank", icon: Joystick },
   { href: "/generate", text: "Generate", icon: WandSparkles },
   { href: "/coupon", text: "Coupon", icon: TicketPercent },
 ];
